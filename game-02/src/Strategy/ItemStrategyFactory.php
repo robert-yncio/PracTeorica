@@ -15,8 +15,11 @@ final class ItemStrategyFactory
 
     public function createStrategy(Item $item): ?ItemUpdateStrategy
     {
+        if ($this->itemTypeIdentifier->isSulfuras($item)) {
+            return null;
+        }
+
         return match (true) {
-            $this->itemTypeIdentifier->isSulfuras($item) => null,
             $this->itemTypeIdentifier->isAgedBrie($item) => new AgedBrieStrategy(),
             $this->itemTypeIdentifier->isBackstagePasses($item) => new BackstagePassesStrategy(),
             $this->itemTypeIdentifier->isConjured($item) => new NormalItemStrategy(degradationRate: 2),

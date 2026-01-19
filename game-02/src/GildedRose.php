@@ -21,14 +21,26 @@ final class GildedRose
     public function updateQuality(): void
     {
         foreach ($this->items as $item) {
+            if (! $this->isValidItem($item)) {
+                continue;
+            }
+
             $strategy = $this->strategyFactory->createStrategy($item);
-            
+
             if ($strategy === null) {
                 continue;
             }
-            
+
             $this->updateItem($item, $strategy);
         }
+    }
+
+    private function isValidItem(Item $item): bool
+    {
+        return $item !== null
+            && $item->name !== ''
+            && $item->quality >= 0
+            && $item->quality <= 50;
     }
 
     private function updateItem(Item $item, ItemUpdateStrategy $strategy): void

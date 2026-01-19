@@ -15,7 +15,7 @@ final class AgedBrieStrategy extends AbstractItemStrategy
 
     public function applyExpiredPenalty(Item $item): void
     {
-        if ($item->sellIn < 0) {
+        if ($this->isExpired($item)) {
             $this->increaseQuality($item);
         }
     }

@@ -20,7 +20,7 @@ final class NormalItemStrategy extends AbstractItemStrategy
 
     public function applyExpiredPenalty(Item $item): void
     {
-        if ($item->sellIn < 0) {
+        if ($this->isExpired($item)) {
             $this->decreaseQuality($item, $this->degradationRate);
         }
     }

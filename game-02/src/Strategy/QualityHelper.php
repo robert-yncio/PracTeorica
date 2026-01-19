@@ -9,6 +9,7 @@ use GildedRose\Item;
 trait QualityHelper
 {
     private const MAX_QUALITY = 50;
+
     private const MIN_QUALITY = 0;
 
     protected function increaseQuality(Item $item): void

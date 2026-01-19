@@ -10,9 +10,13 @@ abstract class AbstractItemStrategy implements ItemUpdateStrategy
 {
     use QualityHelper;
 
-
     public function updateSellIn(Item $item): void
     {
         $item->sellIn = $item->sellIn - 1;
+    }
+
+    protected function isExpired(Item $item): bool
+    {
+        return $item->sellIn < 0;
     }
 }
