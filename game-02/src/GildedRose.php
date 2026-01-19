@@ -6,6 +6,12 @@ namespace GildedRose;
 
 final class GildedRose
 {
+    private const AGED_BRIE = 'Aged Brie';
+    private const BACKSTAGE_PASSES = 'Backstage passes to a TAFKAL80ETC concert';
+    private const SULFURAS = 'Sulfuras, Hand of Ragnaros';
+    private const MAX_QUALITY = 50;
+    private const MIN_QUALITY = 0;
+
     /**
      * @param Item[] $items
      */
@@ -17,60 +23,115 @@ final class GildedRose
     public function updateQuality(): void
     {
         foreach ($this->items as $item) {
-            $isConjured = str_starts_with($item->name, 'Conjured');
-            $degradationRate = $isConjured ? 2 : 1;
-
-            if ($item->name !== 'Aged Brie' and $item->name !== 'Backstage passes to a TAFKAL80ETC concert') {
-                if ($item->quality > 0) {
-                    if ($item->name !== 'Sulfuras, Hand of Ragnaros') {
-                        $item->quality = $item->quality - $degradationRate;
-                        if ($item->quality < 0) {
-                            $item->quality = 0;
-                        }
-                    }
-                }
-            } else {
-                if ($item->quality < 50) {
-                    $item->quality = $item->quality + 1;
-                    if ($item->name === 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->sellIn < 11) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                        if ($item->sellIn < 6) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($item->name !== 'Sulfuras, Hand of Ragnaros') {
-                $item->sellIn = $item->sellIn - 1;
-            }
-
-            if ($item->sellIn < 0) {
-                if ($item->name !== 'Aged Brie') {
-                    if ($item->name !== 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->quality > 0) {
-                            if ($item->name !== 'Sulfuras, Hand of Ragnaros') {
-                                $item->quality = $item->quality - $degradationRate;
-                                if ($item->quality < 0) {
-                                    $item->quality = 0;
-                                }
-                            }
-                        }
-                    } else {
-                        $item->quality = $item->quality - $item->quality;
-                    }
-                } else {
-                    if ($item->quality < 50) {
-                        $item->quality = $item->quality + 1;
-                    }
-                }
-            }
+            $this->updateItem($item);
         }
+    }
+
+    private function updateItem(Item $item): void
+    {
+        if ($this->isSulfuras($item)) {
+            return; 
+        }
+
+        $this->updateQualityForItem($item);
+        $this->updateSellIn($item);
+        $this->applyExpiredPenalty($item);
+    }
+
+    private function updateSellIn(Item $item): void
+    {
+        if (!$this->isSulfuras($item)) {
+            $item->sellIn = $item->sellIn - 1;
+        }
+    }
+
+    private function updateQualityForItem(Item $item): void
+    {
+        if ($this->isAgedBrie($item)) {
+            $this->updateAgedBrie($item);
+        } elseif ($this->isBackstagePasses($item)) {
+            $this->updateBackstagePasses($item);
+        } else {
+            $this->updateNormalItem($item);
+        }
+    }
+
+    private function updateAgedBrie(Item $item): void
+    {
+        $this->increaseQuality($item);
+    }
+
+    private function updateBackstagePasses(Item $item): void
+    {
+        $this->increaseQuality($item);
+
+        if ($item->sellIn < 11) {
+            $this->increaseQuality($item);
+        }
+
+        if ($item->sellIn < 6) {
+            $this->increaseQuality($item);
+        }
+    }
+
+    private function updateNormalItem(Item $item): void
+    {
+        $degradationRate = $this->getDegradationRate($item);
+        $this->decreaseQuality($item, $degradationRate);
+    }
+
+    private function applyExpiredPenalty(Item $item): void
+    {
+        if ($item->sellIn >= 0) {
+            return;
+        }
+
+        if ($this->isAgedBrie($item)) {
+            $this->increaseQuality($item);
+        } elseif ($this->isBackstagePasses($item)) {
+            $item->quality = 0;
+        } else {
+            $degradationRate = $this->getDegradationRate($item);
+            $this->decreaseQuality($item, $degradationRate);
+        }
+    }
+
+    private function getDegradationRate(Item $item): int
+    {
+        return $this->isConjured($item) ? 2 : 1;
+    }
+
+    private function increaseQuality(Item $item): void
+    {
+        if ($item->quality < self::MAX_QUALITY) {
+            $item->quality = $item->quality + 1;
+        }
+    }
+
+    private function decreaseQuality(Item $item, int $amount): void
+    {
+        if ($item->quality > 0) {
+            $item->quality = max(self::MIN_QUALITY, $item->quality - $amount);
+        }
+    }
+
+    private function isAgedBrie(Item $item): bool
+    {
+        return $item->name === self::AGED_BRIE;
+    }
+
+    private function isBackstagePasses(Item $item): bool
+    {
+        return $item->name === self::BACKSTAGE_PASSES;
+    }
+
+    private function isSulfuras(Item $item): bool
+    {
+        return $item->name === self::SULFURAS;
+    }
+
+    private function isConjured(Item $item): bool
+    {
+        return str_starts_with($item->name, 'Conjured');
     }
 }
