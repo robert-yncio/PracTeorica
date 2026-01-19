@@ -182,7 +182,6 @@ You are running Composer with SSL/TLS protection disabled.</p>
 <p class="has-line-data" data-line-start="29" data-line-end="31">phpunit --coverage-html build/coverage<br>
 PHPUnit 9.6.31 by Sebastian Bergmann and contributors.</p>
 </blockquote>
-<p class="has-line-data" data-line-start="32" data-line-end="33">Warning:       No code coverage driver available</p>
 <p class="has-line-data" data-line-start="34" data-line-end="35">…                                                                 3 / 3 (100%)</p>
 <p class="has-line-data" data-line-start="36" data-line-end="37">Time: 00:00.025, Memory: 6.00 MB</p>
 <p class="has-line-data" data-line-start="38" data-line-end="41">OK (3 tests, 3 assertions)<br>
