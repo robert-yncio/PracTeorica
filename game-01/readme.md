@@ -48,3 +48,13 @@ El documento generado puede crecer exponencialmente en contenido. Debes consider
 
 > 🚨 Buscamos a alguien que pueda anticipar problemas futuros mientras desarrolla.
 
+
+
+-------------------------------------------------------------------------------- X --------------------------------------------------------------------------------
+cd game-01
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+
+
